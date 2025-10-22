@@ -81,38 +81,73 @@ def connect_to_sheets():
             "https://www.googleapis.com/auth/drive"
         ]
         
-        # Ưu tiên dùng file JSON trực tiếp
-        creds_file = 'credentials/service-account.json'
-        if os.path.exists(creds_file):
-            print("✅ Đang dùng file JSON credentials")
-            creds = Credentials.from_service_account_file(creds_file, scopes=scopes)
-        else:
-            # Dùng environment variables
-            print("✅ Đang dùng environment variables")
-            private_key = os.environ.get('PRIVATE_KEY', '')
-            
+        # CÁCH 1: Dùng service account JSON từ biến môi trường (Railway)
+        credentials_json = os.environ.get('GOOGLE_SHEETS_CREDENTIALS')
+        
+        if credentials_json:
+            print("✅ Đang dùng GOOGLE_SHEETS_CREDENTIALS từ biến môi trường")
+            try:
+                credentials_info = json.loads(credentials_json)
+                creds = Credentials.from_service_account_info(credentials_info, scopes=scopes)
+                client = gspread.authorize(creds)
+                print("✅ Kết nối Google Sheets thành công!")
+                return client
+            except Exception as e:
+                print(f"❌ Lỗi parse credentials từ biến môi trường: {e}")
+        
+        # CÁCH 2: Dùng file service account (local development)
+        creds_files = [
+            'service-account.json',
+            'credentials/service-account.json',
+            'service_account.json'
+        ]
+        
+        for creds_file in creds_files:
+            if os.path.exists(creds_file):
+                print(f"✅ Đang dùng file: {creds_file}")
+                try:
+                    creds = Credentials.from_service_account_file(creds_file, scopes=scopes)
+                    client = gspread.authorize(creds)
+                    print("✅ Kết nối Google Sheets thành công!")
+                    return client
+                except Exception as e:
+                    print(f"❌ Lỗi đọc file {creds_file}: {e}")
+                    continue
+        
+        # CÁCH 3: Dùng các biến môi trường riêng lẻ (fallback)
+        print("🔄 Thử dùng biến môi trường riêng lẻ...")
+        private_key = os.environ.get('PRIVATE_KEY', '')
+        
+        if private_key:
             # Fix private key formatting
             private_key = private_key.replace('"', '').replace('\\n', '\n')
             
             creds_dict = {
                 "type": "service_account",
-                "project_id": os.environ.get('PROJECT_ID'),
-                "private_key_id": os.environ.get('PRIVATE_KEY_ID'),
+                "project_id": os.environ.get('PROJECT_ID', ''),
+                "private_key_id": os.environ.get('PRIVATE_KEY_ID', ''),
                 "private_key": private_key,
-                "client_email": os.environ.get('CLIENT_EMAIL'),
-                "client_id": os.environ.get('CLIENT_ID'),
+                "client_email": os.environ.get('CLIENT_EMAIL', ''),
+                "client_id": os.environ.get('CLIENT_ID', ''),
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                 "token_uri": "https://oauth2.googleapis.com/token",
+                "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs"
             }
             
-            creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+            # Kiểm tra xem có đủ thông tin không
+            if all([creds_dict['private_key'], creds_dict['client_email'], creds_dict['project_id']]):
+                creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+                client = gspread.authorize(creds)
+                print("✅ Kết nối Google Sheets thành công với biến môi trường!")
+                return client
         
-        client = gspread.authorize(creds)
-        print("✅ Kết nối Google Sheets thành công!")
-        return client
+        print("❌ Không tìm thấy thông tin xác thực nào")
+        return None
         
     except Exception as e:
         print(f"❌ Lỗi kết nối Google Sheets: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return None
 
 def normalize_date(date_str):
