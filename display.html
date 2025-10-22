@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trạng thái phòng học nhóm - Thư viện IUH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --iuh-blue: #08387f;
+            --iuh-red: #920000;
+            --light-gray: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #08387f 0%, #920000 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .display-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin: 20px auto;
+            overflow: hidden;
+            max-width: 1400px;
+        }
+        
+        .header {
+            background: var(--iuh-blue);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 5px solid var(--iuh-red);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0;
+            font-weight: 300;
+        }
+        
+        .stats-bar {
+            background: var(--light-gray);
+            padding: 15px 0;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--iuh-blue);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        .rooms-grid {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .room-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--iuh-blue);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .room-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .room-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--iuh-blue);
+        }
+        
+        .room-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-inuse {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-maintenance {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .room-info {
+            margin-bottom: 10px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .info-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .current-users {
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            font-size: 0.85rem;
+        }
+        
+        .last-update {
+            text-align: center;
+            padding: 20px;
+            background: var(--light-gray);
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .floor-section {
+            margin-bottom: 30px;
+        }
+        
+        .floor-title {
+            background: var(--iuh-blue);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header h2 {
+                font-size: 1.4rem;
+            }
+            
+            .rooms-grid {
+                grid-template-columns: 1fr;
+                padding: 15px;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* Animation for status changes */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .status-changing {
+            animation: pulse 0.5s ease-in-out;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="display-container">
+        <!-- Navigation Menu -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-book me-2"></i>Thư viện IUH
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="fas fa-home me-1"></i>Trang chủ
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/display">
+                        <i class="fas fa-tv me-1"></i>Hiển thị
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/report">
+                        <i class="fas fa-chart-bar me-1"></i>Báo cáo
+                    </a>
+                </li>
+            </ul>
+            <div class="navbar-text">
+                <small>Chế độ hiển thị công khai</small>
+            </div>
+        </div>
+    </div>
+</nav>
+        <!-- Header -->
+        <div class="header">
+            <h1>ĐẠI HỌC CÔNG NGHIỆP TP. HỒ CHÍ MINH</h1>
+            <h2>TRUNG TÂM THƯ VIỆN - TRẠNG THÁI PHÒNG HỌC NHÓM</h2>
+        </div>
+        
+        <!-- Statistics Bar -->
+        <div class="stats-bar">
+            <div class="container">
+                <div class="row text-center">
+                    <div class="col-md-3 stat-item">
+                        <div class="stat-number" id="totalRooms">-</div>
+                        <div class="stat-label">Tổng số phòng</div>
+                    </div>
+                    <div class="col-md-3 stat-item">
+                        <div class="stat-number" id="availableRooms">-</div>
+                        <div class="stat-label">Phòng trống</div>
+                    </div>
+                    <div class="col-md-3 stat-item">
+                        <div class="stat-number" id="inUseRooms">-</div>
+                        <div class="stat-label">Đang sử dụng</div>
+                    </div>
+                    <div class="col-md-3 stat-item">
+                        <div class="stat-number" id="todayUsage">-</div>
+                        <div class="stat-label">Lượt dùng hôm nay</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rooms Display -->
+        <div class="container-fluid py-4">
+            <!-- Lầu 3 -->
+            <div class="floor-section">
+                <div class="floor-title">
+                    <i class="fas fa-building me-2"></i>LẦU 3 - PHÒNG 1-7
+                </div>
+                <div class="rooms-grid" id="floor3-rooms">
+                    <!-- Rooms will be dynamically loaded here -->
+                </div>
+            </div>
+            
+            <!-- Lầu 4 -->
+            <div class="floor-section">
+                <div class="floor-title">
+                    <i class="fas fa-building me-2"></i>LẦU 4 - PHÒNG 8-14
+                </div>
+                <div class="rooms-grid" id="floor4-rooms">
+                    <!-- Rooms will be dynamically loaded here -->
+                </div>
+            </div>
+            
+            <!-- Tầng trệt -->
+            <div class="floor-section">
+                <div class="floor-title">
+                    <i class="fas fa-building me-2"></i>TẦNG TRỆT - PHÒNG 15
+                </div>
+                <div class="rooms-grid" id="ground-floor-rooms">
+                    <!-- Rooms will be dynamically loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Last Update -->
+        <div class="last-update">
+            <i class="fas fa-sync-alt me-2"></i>
+            Cập nhật lần cuối: <span id="lastUpdateTime">--:--:--</span>
+            | Tự động cập nhật mỗi 10 giây
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let lastData = null;
+        
+        // Load dữ liệu ban đầu
+        async function loadDisplayData() {
+            try {
+                console.log("🔄 Đang tải dữ liệu hiển thị...");
+                
+                const [onlineResponse, statsResponse] = await Promise.all([
+                    fetch('/api/get_online_data'),
+                    fetch('/api/get_all_stats')
+                ]);
+                
+                if (!onlineResponse.ok || !statsResponse.ok) {
+                    throw new Error('Lỗi kết nối API');
+                }
+                
+                const onlineData = await onlineResponse.json();
+                const statsData = await statsResponse.json();
+                
+                updateDisplay(onlineData, statsData);
+                updateLastUpdateTime();
+                
+            } catch (error) {
+                console.error('❌ Lỗi tải dữ liệu:', error);
+                showErrorState();
+            }
+        }
+        
+        function updateDisplay(onlineData, statsData) {
+            // Cập nhật thống kê
+            updateStatistics(onlineData, statsData);
+            
+            // Cập nhật trạng thái phòng
+            updateRoomsDisplay(onlineData);
+            
+            lastData = { onlineData, statsData };
+        }
+        
+        function updateStatistics(onlineData, statsData) {
+            const totalRooms = 15; // Tổng số phòng cố định
+            let availableRooms = 0;
+            let inUseRooms = 0;
+            
+            // Đếm trạng thái phòng
+            if (onlineData.data && onlineData.data.length > 0) {
+                onlineData.data.forEach(room => {
+                    if (room[1] === 'Sẵn sàng') {
+                        availableRooms++;
+                    } else if (room[1] === 'Đang sử dụng' || room[1] === 'Đang phục vụ') {
+                        inUseRooms++;
+                    }
+                });
+            }
+            
+            // Cập nhật DOM
+            document.getElementById('totalRooms').textContent = totalRooms;
+            document.getElementById('availableRooms').textContent = availableRooms;
+            document.getElementById('inUseRooms').textContent = inUseRooms;
+            document.getElementById('todayUsage').textContent = 
+                statsData.success ? statsData.data.today_usage : '-';
+        }
+        
+        function updateRoomsDisplay(onlineData) {
+            // Xóa nội dung cũ
+            document.getElementById('floor3-rooms').innerHTML = '';
+            document.getElementById('floor4-rooms').innerHTML = '';
+            document.getElementById('ground-floor-rooms').innerHTML = '';
+            
+            if (!onlineData.data || onlineData.data.length === 0) {
+                showNoDataMessage();
+                return;
+            }
+            
+            // Hiển thị từng phòng
+            onlineData.data.forEach(room => {
+                const roomNumber = parseInt(room[0]);
+                const status = room[1];
+                const note = room[2] || '';
+                
+                const roomCard = createRoomCard(roomNumber, status, note);
+                
+                // Phân loại theo tầng
+                if (roomNumber >= 1 && roomNumber <= 7) {
+                    document.getElementById('floor3-rooms').appendChild(roomCard);
+                } else if (roomNumber >= 8 && roomNumber <= 14) {
+                    document.getElementById('floor4-rooms').appendChild(roomCard);
+                } else if (roomNumber === 15) {
+                    document.getElementById('ground-floor-rooms').appendChild(roomCard);
+                }
+            });
+        }
+        
+        function createRoomCard(roomNumber, status, note) {
+            const card = document.createElement('div');
+            card.className = 'room-card';
+            
+            let statusClass = 'status-available';
+            let statusText = 'Sẵn sàng';
+            let icon = 'fa-door-open';
+            
+            if (status === 'Đang sử dụng' || status === 'Đang phục vụ') {
+                statusClass = 'status-inuse';
+                statusText = 'Đang sử dụng';
+                icon = 'fa-users';
+            } else if (status === 'Bảo trì' || status === 'Đóng cửa') {
+                statusClass = 'status-maintenance';
+                statusText = 'Bảo trì';
+                icon = 'fa-tools';
+            }
+            
+            card.innerHTML = `
+                <div class="room-header">
+                    <div class="room-number">
+                        <i class="fas ${icon} me-2"></i>Phòng ${roomNumber}
+                    </div>
+                    <div class="room-status ${statusClass}">${statusText}</div>
+                </div>
+                <div class="room-info">
+                    <div class="info-item">
+                        <span class="info-label">Trạng thái:</span>
+                        <span class="info-value">${statusText}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Sức chứa:</span>
+                        <span class="info-value">6-8 người</span>
+                    </div>
+                    ${note ? `
+                    <div class="info-item">
+                        <span class="info-label">Ghi chú:</span>
+                        <span class="info-value">${note}</span>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="current-users">
+                    <div class="user-item">
+                        <span>📊</span>
+                        <span>Máy lạnh • WiFi • Ổ cắm</span>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        function showNoDataMessage() {
+            const message = document.createElement('div');
+            message.className = 'col-12 text-center py-5';
+            message.innerHTML = `
+                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                <h4>Không có dữ liệu phòng học</h4>
+                <p class="text-muted">Vui lòng kiểm tra kết nối hệ thống</p>
+            `;
+            document.getElementById('floor3-rooms').appendChild(message);
+        }
+        
+        function showErrorState() {
+            document.getElementById('totalRooms').textContent = '-';
+            document.getElementById('availableRooms').textContent = '-';
+            document.getElementById('inUseRooms').textContent = '-';
+            document.getElementById('todayUsage').textContent = '-';
+            
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'col-12 text-center py-5';
+            errorMessage.innerHTML = `
+                <i class="fas fa-wifi fa-3x text-danger mb-3"></i>
+                <h4>Mất kết nối hệ thống</h4>
+                <p class="text-muted">Đang thử kết nối lại...</p>
+            `;
+            
+            document.getElementById('floor3-rooms').innerHTML = '';
+            document.getElementById('floor3-rooms').appendChild(errorMessage);
+        }
+        
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('vi-VN');
+            document.getElementById('lastUpdateTime').textContent = timeString;
+        }
+        
+        // Khởi tạo
+        window.onload = function() {
+            loadDisplayData();
+            
+            // Auto-refresh mỗi 10 giây
+            setInterval(loadDisplayData, 10000);
+            
+            // Thêm hiệu ứng khi có thay đổi trạng thái
+            setInterval(() => {
+                if (lastData) {
+                    loadDisplayData().then(() => {
+                        // So sánh dữ liệu cũ và mới để thêm hiệu ứng
+                        // (có thể implement chi tiết hơn nếu cần)
+                    });
+                }
+            }, 10000);
+        };
+    </script>
+</body>
+</html>
