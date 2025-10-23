@@ -18,7 +18,7 @@ jobs:
           curl -X POST "https://backboard.railway.app/graphql/v2" \
           -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
           -H "Content-Type: application/json" \
-          -d '{"query":"mutation { projectDeploy(input: { projectId: \"YOUR_PROJECT_ID\" }) { id } }"}'
+          -d '{"query":"mutation { projectDeploy(input: { projectId: \"3826dccf-6cf2-4755-8d34-4fe7a957e0c3" }) { id } }"}'
 
       - name: Stop app at 21:30
         if: github.event.schedule == '30 14 * * *'
@@ -27,4 +27,4 @@ jobs:
           curl -X POST "https://backboard.railway.app/graphql/v2" \
           -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
           -H "Content-Type: application/json" \
-          -d '{"query":"mutation { serviceDelete(input: { serviceId: \"YOUR_SERVICE_ID\" }) { id } }"}'
+          -d '{"query":"mutation { serviceDelete(input: { serviceId: \"d3362d88-1c5b-4e7f-a0f7-cd5dc90c5ce3" }) { id } }"}'
