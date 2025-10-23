@@ -19,6 +19,7 @@ data_cache = {}
 cache_timestamp = {}
 last_request_time = {}
 REQUEST_INTERVAL = 2  # 2 giây giữa các request
+CACHE_MAX_AGE = 30  # 30 giây
 
 def rate_limit(api_name):
     """Giới hạn tần suất request"""
@@ -33,8 +34,27 @@ def rate_limit(api_name):
     
     last_request_time[api_name] = time.time()
 
-def get_cached_data(sheet_name, cache_duration=30):
+def clear_old_cache():
+    """Tự động xóa cache cũ"""
+    current_time = time.time()
+    sheets_to_clear = []
+    
+    for sheet_name, timestamp in cache_timestamp.items():
+        if current_time - timestamp > CACHE_MAX_AGE:
+            sheets_to_clear.append(sheet_name)
+    
+    for sheet_name in sheets_to_clear:
+        if sheet_name in data_cache:
+            del data_cache[sheet_name]
+        if sheet_name in cache_timestamp:
+            del cache_timestamp[sheet_name]
+        print(f"🧹 [AUTO_CLEAR] Đã xóa cache {sheet_name}")
+
+def get_cached_data(sheet_name, cache_duration=10):  # Giảm cache time xuống 10 giây
     """Lấy dữ liệu có cache để giảm request"""
+    # Xóa cache cũ trước
+    clear_old_cache()
+    
     current_time = time.time()
     
     # Kiểm tra cache
@@ -72,6 +92,16 @@ def clear_cache():
     data_cache.clear()
     cache_timestamp.clear()
     print("🧹 [CACHE] Đã xóa toàn bộ cache")
+
+# ==================== CACHE HEADERS ====================
+@app.after_request
+def add_header(response):
+    """Thêm headers để tránh cache trên trình duyệt"""
+    if request.path.startswith('/api/'):
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    return response
 
 # ==================== GOOGLE SHEETS CONNECTION ====================
 def connect_to_sheets():
@@ -273,8 +303,8 @@ def get_data():
         rate_limit('get_data')
         print("🔍 [get_data] Đang lấy dữ liệu (cached)...")
         
-        # Sử dụng cache - 30 giây
-        data = get_cached_data('Data', 30)
+        # Sử dụng cache - 10 giây (giảm từ 30)
+        data = get_cached_data('Data', 10)
         
         if len(data) <= 1:
             return jsonify([])
@@ -315,8 +345,8 @@ def get_data1():
         rate_limit('get_data1')
         print("🔍 [get_data1] Đang lấy dữ liệu (cached)...")
         
-        # Sử dụng cache - 30 giây
-        data = get_cached_data('Data1', 30)
+        # Sử dụng cache - 10 giây (giảm từ 30)
+        data = get_cached_data('Data1', 10)
         
         if len(data) < 2:
             return jsonify([])
@@ -339,15 +369,8 @@ def get_data_count_today():
     try:
         print("🔍 [get_data_count_today] Đang tính thống kê hôm nay...")
         
-        client = connect_to_sheets()
-        if not client:
-            return jsonify({"count": 0})
-            
-        sheet_id = os.environ.get('SHEET_ID', '1i5N5Gdk-SqPN7Vy5IFiHiK5CTCw9WDag2EMZ1GBI8Wo')
-        spreadsheet = client.open_by_key(sheet_id)
-        sheet = spreadsheet.worksheet('Data')
-        
-        data = sheet.get_all_values()
+        # Sử dụng cache để tránh request nhiều lần
+        data = get_cached_data('Data', 10)
         
         if len(data) <= 1:
             return jsonify({"count": 0})
@@ -375,20 +398,13 @@ def get_data1_count_today():
     try:
         print("🔍 [get_data1_count_today] Đang tính thống kê đăng ký hôm nay...")
         
-        client = connect_to_sheets()
-        if not client:
-            return jsonify(0)
-            
-        sheet_id = os.environ.get('SHEET_ID', '1i5N5Gdk-SqPN7Vy5IFiHiK5CTCw9WDag2EMZ1GBI8Wo')
-        spreadsheet = client.open_by_key(sheet_id)
-        sheet = spreadsheet.worksheet('Data1')
-        
-        today = datetime.now().strftime("%d/%m/%Y")
-        data = sheet.get_all_values()
+        # Sử dụng cache
+        data = get_cached_data('Data1', 10)
         
         if len(data) <= 1:
             return jsonify(0)
             
+        today = datetime.now().strftime("%d/%m/%Y")
         count = 0
         
         for row in data[1:]:
@@ -411,23 +427,16 @@ def get_current_month_count_data():
     try:
         print("🔍 [get_current_month_count_data] Đang tính thống kê tháng...")
         
-        client = connect_to_sheets()
-        if not client:
-            return jsonify(0)
-            
-        sheet_id = os.environ.get('SHEET_ID', '1i5N5Gdk-SqPN7Vy5IFiHiK5CTCw9WDag2EMZ1GBI8Wo')
-        spreadsheet = client.open_by_key(sheet_id)
-        sheet = spreadsheet.worksheet('Data')
-        
-        current_date = datetime.now()
-        current_month = current_date.month
-        current_year = current_date.year
-        
-        data = sheet.get_all_values()
+        # Sử dụng cache
+        data = get_cached_data('Data', 10)
         
         if len(data) <= 1:
             return jsonify(0)
             
+        current_date = datetime.now()
+        current_month = current_date.month
+        current_year = current_date.year
+        
         count = 0
         
         for row in data[1:]:
@@ -479,8 +488,8 @@ def get_online_data():
         rate_limit('get_online_data')
         print("🔍 [get_online_data] Đang lấy dữ liệu (cached)...")
         
-        # Sử dụng cache - 15 giây (online data cần cập nhật thường xuyên hơn)
-        data = get_cached_data('Online', 15)
+        # Sử dụng cache - 10 giây (giảm từ 15)
+        data = get_cached_data('Online', 10)
         
         if len(data) < 2:
             return jsonify({'headers': [], 'data': []})
@@ -665,8 +674,8 @@ def quick_stats():
         results = {}
         
         # Lấy tất cả dữ liệu một lần
-        data = get_cached_data('Data', 30)
-        data1 = get_cached_data('Data1', 30)
+        data = get_cached_data('Data', 10)  # Giảm cache time
+        data1 = get_cached_data('Data1', 10)  # Giảm cache time
         
         today = datetime.now().strftime("%d/%m/%Y")
         current_month = datetime.now().month
@@ -722,12 +731,12 @@ def quick_stats():
 
 @app.route('/api/get_all_stats')
 def get_all_stats():
-    """API tổng hợp thống kê cho frontend (used by /api/get_all_stats)"""
+    """API tổng hợp thống kê cho frontend"""
     try:
         rate_limit('get_all_stats')
-        # Lấy dữ liệu cache (30s)
-        data = get_cached_data('Data', 30)
-        data1 = get_cached_data('Data1', 30)
+        # Sử dụng cache với thời gian ngắn hơn
+        data = get_cached_data('Data', 10)  # Giảm từ 30 xuống 10
+        data1 = get_cached_data('Data1', 10)  # Giảm từ 30 xuống 10
 
         today = datetime.now().strftime("%d/%m/%Y")
         current_month = datetime.now().month
@@ -784,7 +793,7 @@ def get_report_data():
         print(f"📊 [REPORT] Đang xử lý báo cáo: staff={staff_code}, location={location}, from={start_date_str}, to={end_date_str}")
         
         # Lấy dữ liệu từ cache
-        sheet_data = get_cached_data('Data', 30)
+        sheet_data = get_cached_data('Data', 10)
         
         if len(sheet_data) <= 1:
             return jsonify([])
