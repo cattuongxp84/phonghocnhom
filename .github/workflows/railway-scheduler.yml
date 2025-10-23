@@ -25,4 +25,4 @@ jobs:
         run: railway link --project 3826dccf-6cf2-4755-8d34-4fe7a957e0c3
 
       - name: Deploy app lên Railway
-        run: railway up
+        run: railway up --service d3362d88-1c5b-4e7f-a0f7-cd5dc90c5ce3
