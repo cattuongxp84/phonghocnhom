@@ -1,30 +1,21 @@
-name: Railway App Scheduler
+name: Keep Railway App Alive
 
 on:
   schedule:
-    # Giờ UTC = VN -7
-    - cron: "0 0 * * *"      # 07:00 sáng VN bật app
-    - cron: "30 14 * * *"    # 21:30 tối VN tắt app
-  workflow_dispatch:
+    - cron: "*/5 * * * *"  # chạy mỗi 5 phút
+  workflow_dispatch:       # cho phép chạy thủ công từ tab Actions
 
 jobs:
-  control-app:
+  ping:
     runs-on: ubuntu-latest
-    steps:
-      - name: Wake up app at 7:00
-        if: github.event.schedule == '0 0 * * *'
-        run: |
-          echo "🔹 Bật app Railway"
-          curl -X POST "https://backboard.railway.app/graphql/v2" \
-          -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          -d '{"query":"mutation { projectDeploy(input: { projectId: \"3826dccf-6cf2-4755-8d34-4fe7a957e0c3" }) { id } }"}'
 
-      - name: Stop app at 21:30
-        if: github.event.schedule == '30 14 * * *'
+    steps:
+      - name: Gửi ping để giữ server Railway hoạt động
         run: |
-          echo "🔸 Dừng app Railway"
-          curl -X POST "https://backboard.railway.app/graphql/v2" \
-          -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          -d '{"query":"mutation { serviceDelete(input: { serviceId: \"d3362d88-1c5b-4e7f-a0f7-cd5dc90c5ce3" }) { id } }"}'
+          echo "🔄 Đang ping ứng dụng Railway..."
+          curl -I https://<tên-miền-hoặc-app>.up.railway.app || echo "Không thể ping được ứng dụng!"
+
+      - name: In thông tin dự án
+        run: |
+          echo "📦 Project ID: 3826dccf-6cf2-4755-8d34-4fe7a957e0c3"
+          echo "🖥️  Service ID: d3362d88-1c5b-4e7f-a0f7-cd5dc90c5ce3"
