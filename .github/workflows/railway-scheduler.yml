@@ -1,21 +1,23 @@
-name: Keep Railway App Alive
+name: Deploy to Railway
 
 on:
-  schedule:
-    - cron: "*/5 * * * *"  # chạy mỗi 5 phút
-  workflow_dispatch:       # cho phép chạy thủ công từ tab Actions
+  push:
+    branches:
+      - main
 
 jobs:
-  ping:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Gửi ping để giữ server Railway hoạt động
-        run: |
-          echo "🔄 Đang ping ứng dụng Railway..."
-          curl -I https://phonghocnhom-production.up.railway.app || echo "Không thể ping được ứng dụng!"
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: In thông tin dự án
+      - name: Cài Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy app lên Railway
         run: |
-          echo "📦 Project ID: 3826dccf-6cf2-4755-8d34-4fe7a957e0c3"
-          echo "🖥️  Service ID: d3362d88-1c5b-4e7f-a0f7-cd5dc90c5ce3"
+          railway link 3826dccf-6cf2-4755-8d34-4fe7a957e0c3
+          railway up --service d3362d88-1c5b-4e7f-a0f7-cd5dc90c5ce3
+        env:
+          RAILWAY_TOKEN: ${{ 8c11e2e7-9fc6-4b1e-b152-65027710dc6e }}
