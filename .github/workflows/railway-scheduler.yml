@@ -8,16 +8,21 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Cài Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Deploy app lên Railway
-        run: |
-          run: railway link --project 3826dccf-6cf2-4755-8d34-4fe7a957e0c3
-          railway up --service d3362d88-1c5b-4e7f-a0f7-cd5dc90c5ce3
+      - name: Đăng nhập Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway login --token $RAILWAY_TOKEN
+
+      - name: Liên kết dự án Railway
+        run: railway link --project 3826dccf-6cf2-4755-8d34-4fe7a957e0c3
+
+      - name: Deploy app lên Railway
+        run: railway up
