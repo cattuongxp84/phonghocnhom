@@ -13,7 +13,7 @@ jobs:
       - name: Gửi ping để giữ server Railway hoạt động
         run: |
           echo "🔄 Đang ping ứng dụng Railway..."
-          curl -I https://<tên-miền-hoặc-app>.up.railway.app || echo "Không thể ping được ứng dụng!"
+          curl -I https://phonghocnhom-production.up.railway.app || echo "Không thể ping được ứng dụng!"
 
       - name: In thông tin dự án
         run: |
