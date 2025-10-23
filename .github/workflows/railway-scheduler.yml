@@ -1,0 +1,30 @@
+name: Railway App Scheduler
+
+on:
+  schedule:
+    # Giờ UTC = VN -7
+    - cron: "0 0 * * *"      # 07:00 sáng VN bật app
+    - cron: "30 14 * * *"    # 21:30 tối VN tắt app
+  workflow_dispatch:
+
+jobs:
+  control-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wake up app at 7:00
+        if: github.event.schedule == '0 0 * * *'
+        run: |
+          echo "🔹 Bật app Railway"
+          curl -X POST "https://backboard.railway.app/graphql/v2" \
+          -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{"query":"mutation { projectDeploy(input: { projectId: \"YOUR_PROJECT_ID\" }) { id } }"}'
+
+      - name: Stop app at 21:30
+        if: github.event.schedule == '30 14 * * *'
+        run: |
+          echo "🔸 Dừng app Railway"
+          curl -X POST "https://backboard.railway.app/graphql/v2" \
+          -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{"query":"mutation { serviceDelete(input: { serviceId: \"YOUR_SERVICE_ID\" }) { id } }"}'
