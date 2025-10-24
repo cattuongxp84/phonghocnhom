@@ -3,287 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thống kê sử dụng phòng học nhóm</title>
+    <title>Trung tâm Thư viện - Quản lý Phòng học nhóm</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --iuh-blue: #08387f;
-            --iuh-red: #920000;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .header {
-            background: white;
-            border-bottom: 3px solid var(--iuh-red);
-            padding: 15px 0;
-        }
-        
-        .header h1 {
-            color: var(--iuh-blue);
-            font-size: 1.8rem;
-            margin-bottom: 0.25rem;
-            font-weight: bold;
-        }
-        
-        .header h2 {
-            color: var(--iuh-red);
-            font-size: 1.4rem;
-            margin-bottom: 0;
-            font-weight: bold;
-        }
-        
-        .filter-section {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .stats-table {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        
-        .stats-table th {
-            background: var(--iuh-blue);
-            color: white;
-            border: 1px solid #ddd;
-            padding: 8px 12px;
-            text-align: center;
-            font-size: 14px;
-        }
-        
-        .stats-table td {
-            padding: 6px 12px;
-            text-align: center;
-            vertical-align: middle;
-            border: 1px solid #ddd;
-            font-size: 13px;
-        }
-        
-        .total-row {
-            background-color: #e3f2fd;
-            font-weight: bold;
-        }
-        
-        .faculty-row {
-            background-color: #f8f9fa;
-        }
-        
-        .loading-spinner {
-            text-align: center;
-            padding: 40px;
-        }
-        
-        .error-message {
-            color: #dc3545;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        /* Print Styles */
-        @media print {
-            @page {
-                size: A4;
-                margin: 15mm;
-            }
-            
-            body {
-                background: white !important;
-                font-size: 12px;
-                line-height: 1.2;
-                margin: 0;
-                padding: 0;
-            }
-            
-            .no-print {
-                display: none !important;
-            }
-            
-            .print-container {
-                width: 100%;
-                margin: 0;
-                padding: 0;
-            }
-            
-            .print-header {
-                text-align: center;
-                margin-bottom: 15px;
-                border-bottom: 2px solid var(--iuh-red);
-                padding-bottom: 10px;
-            }
-            
-            .print-header h2 {
-                color: var(--iuh-blue);
-                font-size: 16px;
-                margin: 5px 0;
-                font-weight: bold;
-            }
-            
-            .print-header h3 {
-                color: var(--iuh-red);
-                font-size: 14px;
-                margin: 5px 0;
-                font-weight: bold;
-            }
-            
-            .print-header h4 {
-                font-size: 13px;
-                margin: 8px 0;
-                font-weight: bold;
-            }
-            
-            .stats-table {
-                box-shadow: none;
-                border: 1px solid #000;
-                margin: 10px 0;
-                page-break-inside: avoid;
-            }
-            
-            .stats-table table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            
-            .stats-table th,
-            .stats-table td {
-                border: 1px solid #000;
-                padding: 4px 6px;
-                font-size: 11px;
-                line-height: 1.1;
-            }
-            
-            .stats-table th {
-                background: #f0f0f0 !important;
-                color: #000 !important;
-                font-weight: bold;
-            }
-            
-            .print-footer {
-                text-align: right;
-                margin-top: 20px;
-                font-style: italic;
-                font-size: 11px;
-            }
-            
-            /* Đảm bảo bảng nằm gọn trong A4 */
-            .table-responsive {
-                max-height: none !important;
-                overflow: visible !important;
-            }
-            
-            /* Tối ưu cho A4 */
-            .container {
-                width: 100% !important;
-                max-width: none !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            
-            /* Giảm khoảng cách giữa các dòng */
-            tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
-            
-            td {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
-        }
-        
-        /* Hiển thị bình thường trên web */
-        .print-container {
-            display: none;
-        }
-        
-        @media screen {
-            .screen-container {
-                display: block;
-            }
-        }
-        
-        @media print {
-            .screen-container {
-                display: none;
-            }
-            .print-container {
-                display: block;
-            }
-        }
-        
-        /* Tối ưu hiển thị trên mobile */
-        @media (max-width: 768px) {
-            .stats-table {
-                font-size: 12px;
-            }
-            
-            .stats-table th,
-            .stats-table td {
-                padding: 4px 6px;
-                font-size: 11px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
     <!-- Navigation Menu -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="#">
-            <i class="fas fa-book me-2"></i>Thư viện IUH
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">
-                        <i class="fas fa-home me-1"></i>Trang chủ
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/register">
-                        <i class="fas fa-chart-bar me-1"></i>Đăng ký phòng học
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/report">
-                        <i class="fas fa-chart-bar me-1"></i>Báo cáo
-                    </a>
-                </li>
-            </ul>
-            <div class="navbar-text">
-                <small>Phiên bản: {{ version }}</small>
-            </div>
-        </div>
-    </div>
-</nav>
-    <!-- Screen View -->
-    <div class="screen-container">
-        <header class="header no-print">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-12 text-center">
-                        <h1>ĐẠI HỌC CÔNG NGHIỆP TP. HỒ CHÍ MINH</h1>
-                        <h2>TRUNG TÂM THƯ VIỆN - THỐNG KÊ SỬ DỤNG PHÒNG</h2>
-                    </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-book me-2"></i>Thư viện IUH
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">
+                            <i class="fas fa-home me-1"></i>Trang chủ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/register">
+                            <i class="fas fa-edit me-1"></i>Đăng ký
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/report">
+                            <i class="fas fa-chart-bar me-1"></i>Báo cáo
+                        </a>
+                    </li>
+                </ul>
+                <div class="navbar-text">
+                    <small>Phiên bản: {{ version }}</small>
                 </div>
             </div>
-        </header>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-12 text-center">
+                    <h1>ĐẠI HỌC CÔNG NGHIỆP TP. HỒ CHÍ MINH</h1>
+                    <h2>TRUNG TÂM THƯ VIỆN</h2>
+                </div>
+            </div>
+        </div>
+    </header>
 
         <div class="container py-4">
             <!-- Filter Section -->

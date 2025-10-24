@@ -1,0 +1,447 @@
+/* Custom Stylesheet for Phong Hoc Nhom Application */
+:root {
+    --iuh-blue: #08387f;
+    --iuh-red: #920000;
+    --light-gray: #f8f9fa;
+    --dark-gray: #343a40;
+}
+
+/* Common Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-gray);
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+}
+
+/* Header Styles */
+.header {
+    background: white;
+    border-bottom: 3px solid var(--iuh-red);
+    padding: 15px 0;
+}
+
+.header h1 {
+    color: var(--iuh-blue);
+    font-size: 1.8rem;
+    margin-bottom: 0.25rem;
+    font-weight: bold;
+}
+
+.header h2 {
+    color: var(--iuh-red);
+    font-size: 1.4rem;
+    margin-bottom: 0;
+    font-weight: bold;
+}
+
+.header-title {
+    color: var(--iuh-blue);
+    font-weight: 700;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--iuh-red);
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+/* Card Styles */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    border: none;
+}
+
+.card-header {
+    background-color: var(--iuh-blue);
+    color: white;
+    font-weight: bold;
+    border-radius: 8px 8px 0 0 !important;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+/* Form Styles */
+.form-control, .form-select {
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+}
+
+/* Button Styles */
+.btn {
+    padding: 5px 10px;
+    font-size: 0.85rem;
+}
+
+.btn-primary {
+    background-color: var(--iuh-blue);
+    border-color: var(--iuh-blue);
+}
+
+.btn-danger {
+    background-color: var(--iuh-red);
+    border-color: var(--iuh-red);
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+/* Alert Styles */
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+    font-size: 0.85rem;
+}
+
+/* Table Styles */
+.stats-table {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.stats-table th {
+    background: var(--iuh-blue);
+    color: white;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.stats-table td {
+    padding: 6px 12px;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #ddd;
+    font-size: 13px;
+}
+
+.total-row {
+    background-color: #e3f2fd;
+    font-weight: bold;
+}
+
+.faculty-row {
+    background-color: #f8f9fa;
+}
+
+/* Filter Section */
+.filter-section {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    text-align: center;
+    padding: 40px;
+}
+
+.error-message {
+    color: #dc3545;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Stat Cards */
+.stat-card {
+    background: white;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    height: 100%;
+}
+
+.stat-card h5 {
+    color: var(--iuh-blue);
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+}
+
+.stat-card p {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+.stat-card.today p {
+    color: var(--iuh-red);
+}
+
+.stat-card.month p {
+    color: #28a745;
+}
+
+/* Online Room Styles */
+.online-room {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.room-card {
+    flex: 1 1 180px;
+    background: white;
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid var(--iuh-blue);
+}
+
+.room-card h5 {
+    color: var(--iuh-blue);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.room-card p {
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+}
+
+.room-card .status {
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.status-available {
+    color: #28a745;
+}
+
+.status-inuse {
+    color: var(--iuh-red);
+}
+
+.status-contact {
+    color: #ffc107;
+}
+
+.status-serving {
+    color: var(--iuh-red);
+}
+
+/* Action Buttons */
+.action-btn {
+    padding: 3px 6px;
+    margin: 0 2px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+}
+
+/* Print Styles */
+@media print {
+    @page {
+        size: A4;
+        margin: 15mm;
+    }
+    
+    body {
+        background: white !important;
+        font-size: 12px;
+        line-height: 1.2;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .no-print {
+        display: none !important;
+    }
+    
+    .print-container {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .print-header {
+        text-align: center;
+        margin-bottom: 15px;
+        border-bottom: 2px solid var(--iuh-red);
+        padding-bottom: 10px;
+    }
+    
+    .print-header h2 {
+        color: var(--iuh-blue);
+        font-size: 16px;
+        margin: 5px 0;
+        font-weight: bold;
+    }
+    
+    .print-header h3 {
+        color: var(--iuh-red);
+        font-size: 14px;
+        margin: 5px 0;
+        font-weight: bold;
+    }
+    
+    .print-header h4 {
+        font-size: 13px;
+        margin: 8px 0;
+        font-weight: bold;
+    }
+    
+    .stats-table {
+        box-shadow: none;
+        border: 1px solid #000;
+        margin: 10px 0;
+        page-break-inside: avoid;
+    }
+    
+    .stats-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .stats-table th,
+    .stats-table td {
+        border: 1px solid #000;
+        padding: 4px 6px;
+        font-size: 11px;
+        line-height: 1.1;
+    }
+    
+    .stats-table th {
+        background: #f0f0f0 !important;
+        color: #000 !important;
+        font-weight: bold;
+    }
+    
+    .print-footer {
+        text-align: right;
+        margin-top: 20px;
+        font-style: italic;
+        font-size: 11px;
+    }
+    
+    .table-responsive {
+        max-height: none !important;
+        overflow: visible !important;
+    }
+    
+    .container {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+    
+    td {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+}
+
+/* Print Container */
+.print-container {
+    display: none;
+}
+
+@media screen {
+    .screen-container {
+        display: block;
+    }
+}
+
+@media print {
+    .screen-container {
+        display: none;
+    }
+    .print-container {
+        display: block;
+    }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .header h2 {
+        font-size: 1.1rem;
+    }
+    
+    .stats-table {
+        font-size: 12px;
+    }
+    
+    .stats-table th,
+    .stats-table td {
+        padding: 4px 6px;
+        font-size: 11px;
+    }
+    
+    .online-room {
+        flex-direction: column;
+    }
+    
+    .room-card {
+        flex: 1 1 auto;
+    }
+}
+
+/* Utility Classes */
+.text-muted {
+    color: #6c757d !important;
+    font-size: 0.85rem;
+}
+
+.form-text {
+    font-size: 0.85rem;
+}
+
+/* Pagination */
+.pagination .page-item.active .page-link {
+    background-color: var(--light-gray);
+    border-color: var(--iuh-blue);
+}
+
+.pagination .page-link {
+    color: var(--iuh-blue);
+    padding: 5px 10px;
+    font-size: 0.85rem;
+}
+
+/* Tab Styles */
+.nav-tabs .nav-link.active {
+    color: var(--iuh-blue);
+    font-weight: bold;
+    border-bottom: 2px solid var(--iuh-blue);
+    font-size: 0.85rem;
+}
+
+.nav-tabs .nav-link {
+    color: var(--dark-gray);
+    font-size: 0.85rem;
+    padding: 8px 12px;
+}
+
+.tab-content {
+    padding: 15px 0;
+}
