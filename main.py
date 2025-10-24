@@ -227,11 +227,7 @@ def index():
 
 @app.route('/report')
 def report():
-    return render_template('report.html')
-
-@app.route('/display')
-def display():
-    return render_template('display.html')
+    return render_template('report.html', version=APP_VERSION)
 
 @app.route('/register')
 def register():
