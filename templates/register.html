@@ -1,0 +1,516 @@
+[file name]: register.html
+[file content begin]
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký phòng học nhóm - Thư viện IUH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --iuh-blue: #08387f;
+            --iuh-red: #920000;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            font-size: 14px;
+        }
+        
+        .header {
+            background: white;
+            color: white;
+            border-bottom: 3px solid var(--iuh-red);
+            padding: 8px 0;
+        }
+        
+        .header h1 {
+            color: var(--iuh-blue);
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+            font-weight: bold;
+        }
+        
+        .header h2 {
+            color: var(--iuh-red);
+            font-size: 1.25rem;
+            margin-bottom: 0;
+            font-weight: bold;
+        }
+        
+        .header-title {
+            color: var(--iuh-blue);
+            font-weight: 700;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--iuh-red);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: var(--iuh-blue);
+            color: white;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0 !important;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            padding: 6px 10px;
+            font-size: 0.85rem;
+        }
+        
+        .btn {
+            padding: 5px 10px;
+            font-size: 0.85rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--iuh-blue);
+            border-color: var(--iuh-blue);
+        }
+        
+        .btn-danger {
+            background-color: var(--iuh-red);
+            border-color: var(--iuh-red);
+        }
+        
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .header h2 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Menu -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-book me-2"></i>Thư viện IUH
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-1"></i>Trang chủ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/register">
+                            <i class="fas fa-edit me-1"></i>Đăng ký
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/report">
+                            <i class="fas fa-chart-bar me-1"></i>Báo cáo
+                        </a>
+                    </li>
+                </ul>
+                <div class="navbar-text">
+                    <small>Phiên bản: {{ version }}</small>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-12 text-center">
+                    <h1 class="mb-0">ĐẠI HỌC CÔNG NGHIỆP TP. HỒ CHÍ MINH</h1>
+                    <h2 class="mb-0">TRUNG TÂM THƯ VIỆN</h2>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container py-3">
+        <h2 class="text-center mb-3 header-title">ĐĂNG KÝ PHÒNG HỌC NHÓM THƯ VIỆN IUH</h2>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-edit me-2"></i>Nhập thông tin đăng ký phòng học nhóm
+                    </div>
+                    <div class="card-body">
+                        <form id="registerForm" onsubmit="handleRegisterSubmit(event)">
+                            <!-- Tìm kiếm sinh viên -->
+                            <div class="form-group mb-2">
+                                <label for="searchInput" class="form-label">Tìm kiếm sinh viên:</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Nhập MSSV..." onkeyup="searchStudent()">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="searchStudent()">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Nhập ít nhất 7 ký tự MSSV</small>
+                            </div>
+                            
+                            <div id="searchResult" class="alert alert-info mb-2" style="display: none; font-size: 0.85rem;"></div>
+                            
+                            <!-- Thông tin sinh viên -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-2">
+                                        <label for="mssv" class="form-label">MSSV:</label>
+                                        <input type="text" class="form-control" id="mssv" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-2">
+                                        <label for="khoavien" class="form-label">Khoa/Viện:</label>
+                                        <select class="form-select" id="khoavien" name="khoavien" required>
+                                            <option value="">- Chọn Khoa/Viện -</option>
+                                            <option value="Khoa Công nghệ Cơ khí">Khoa Công nghệ Cơ khí</option>
+                                            <option value="Khoa Công nghệ Thông tin">Khoa Công nghệ Thông tin</option>
+                                            <option value="Khoa Công nghệ Điện">Khoa Công nghệ Điện</option>
+                                            <option value="Khoa Công nghệ Điện tử">Khoa Công nghệ Điện tử</option>
+                                            <option value="Khoa Công nghệ Động lực">Khoa Công nghệ Động lực</option>
+                                            <option value="Khoa Công nghệ Nhiệt - Lạnh">Khoa Công nghệ Nhiệt - Lạnh</option>
+                                            <option value="Khoa Công nghệ May - Thời trang">Khoa Công nghệ May - Thời trang</option>
+                                            <option value="Khoa Công nghệ Hóa học">Khoa Công nghệ Hóa học</option>
+                                            <option value="Khoa Ngoại ngữ">Khoa Ngoại ngữ</option>
+                                            <option value="Khoa Quản trị Kinh doanh">Khoa Quản trị Kinh doanh</option>
+                                            <option value="Khoa Thương mại - Du lịch">Khoa Thương mại - Du lịch</option>
+                                            <option value="Khoa Kỹ thuật Xây dựng">Khoa Kỹ thuật Xây dựng</option>
+                                            <option value="Khoa Luật">Khoa Luật</option>
+                                            <option value="Viện Tài chính - Kế toán">Viện Tài chính - Kế toán</option>
+                                            <option value="Viện Công nghệ Sinh học và Thực phẩm">Viện Công nghệ Sinh học và Thực phẩm</option>
+                                            <option value="Viện Khoa học Công nghệ và Quản lý Môi trường">Viện Khoa học Công nghệ và Quản lý Môi trường</option>
+                                            <option value="Khoa Khoa học Cơ bản">Khoa Khoa học Cơ bản</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin phòng -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-2">
+                                        <label for="phonghocnhom" class="form-label">Phòng học nhóm:</label>
+                                        <select class="form-select" id="phonghocnhom" name="phonghocnhom" required>        
+                                            <option value="">- Chọn phòng -</option>
+                                            <option value="1">Phòng 1</option>
+                                            <option value="2">Phòng 2</option>
+                                            <option value="3">Phòng 3</option>
+                                            <option value="4">Phòng 4</option>
+                                            <option value="5">Phòng 5</option>
+                                            <option value="6">Phòng 6</option>
+                                            <option value="7">Phòng 7</option>
+                                            <option value="8">Phòng 8</option>
+                                            <option value="9">Phòng 9</option>
+                                            <option value="10">Phòng 10</option>
+                                            <option value="11">Phòng 11</option>
+                                            <option value="12">Phòng 12</option>
+                                            <option value="13">Phòng 13</option>
+                                            <option value="14">Phòng 14</option>
+                                            <option value="15">Phòng 15</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-2">
+                                        <label for="soluong" class="form-label">Số lượng thành viên:</label>
+                                        <input type="number" class="form-control" id="soluong" required min="1" max="20">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Giờ đăng ký -->
+                            <div class="form-group mb-3">
+                                <label for="time" class="form-label">Giờ đăng ký (24 giờ):</label>
+                                <input type="text" class="form-control" id="time" 
+                                       pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]" 
+                                       placeholder="HH:MM (ví dụ: 13:00, 14:30)"
+                                       title="Nhập giờ theo định dạng 24h: HH:MM"
+                                       required>
+                                <div class="form-text">Định dạng: HH:MM (24 giờ) - từ 00:00 đến 23:59. Ví dụ: 13:00, 14:30, 09:15</div>
+                            </div>
+                            
+                            <!-- Nút điều khiển -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="button" class="btn btn-secondary me-md-1" onclick="resetRegisterForm()">
+                                    <i class="fas fa-undo me-1"></i> Xóa form
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus-circle me-1"></i> Đăng ký phòng
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Thông báo hướng dẫn -->
+                <div class="alert alert-info mt-3">
+                    <h6><i class="fas fa-info-circle me-2"></i>Hướng dẫn sử dụng:</h6>
+                    <ul class="mb-0" style="font-size: 0.85rem;">
+                        <li>Nhập MSSV để tìm kiếm thông tin sinh viên (tối thiểu 7 ký tự)</li>
+                        <li>Chọn khoa/viện và phòng học nhóm phù hợp</li>
+                        <li>Nhập số lượng thành viên tham gia (tối đa 20 người)</li>
+                        <li>Chọn giờ đăng ký theo định dạng 24h (HH:MM)</li>
+                        <li>Nhấn "Đăng ký phòng" để hoàn tất đăng ký</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-2 mt-3">
+        <div class="container text-center">
+            <p class="mb-0" style="font-size: 0.85rem;">Trung tâm Thư viện - Đại học Công nghiệp TP.HCM</p>
+            <p class="mb-0" style="font-size: 0.85rem;">Số 12 Nguyễn Văn Bảo, P. Hạnh Thông, Thành phố Hồ Chí Minh</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Thiết lập thời gian hiện tại khi trang tải
+        function setCurrentTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const currentTime = `${hours}:${minutes}`;
+            
+            document.getElementById('time').value = currentTime;
+        }
+
+        // Validation cho input giờ 24h
+        function validateTimeInput() {
+            const timeInput = document.getElementById('time');
+            
+            timeInput.addEventListener('blur', function() {
+                const value = this.value.trim();
+                const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+                
+                if (value && !timeRegex.test(value)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi định dạng giờ',
+                        text: 'Vui lòng nhập giờ theo định dạng 24h: HH:MM (ví dụ: 13:00, 14:30)',
+                        confirmButtonText: 'OK'
+                    });
+                    this.focus();
+                    return false;
+                } else if (value) {
+                    // Chuẩn hóa định dạng: thêm số 0 nếu cần
+                    const [hours, minutes] = value.split(':');
+                    const normalizedHours = hours.padStart(2, '0');
+                    const normalizedTime = `${normalizedHours}:${minutes}`;
+                    
+                    // Kiểm tra lại sau khi chuẩn hóa
+                    if (!timeRegex.test(normalizedTime)) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi định dạng giờ',
+                            text: 'Giờ không hợp lệ. Vui lòng nhập theo định dạng HH:MM',
+                            confirmButtonText: 'OK'
+                        });
+                        this.focus();
+                        return false;
+                    }
+                    
+                    this.value = normalizedTime;
+                }
+                return true;
+            });
+
+            // Xử lý khi người dùng chỉ nhập số
+            timeInput.addEventListener('input', function() {
+                let value = this.value.replace(/[^0-9:]/g, ''); // Chỉ cho phép số và dấu :
+                
+                // Tự động thêm dấu : sau 2 chữ số đầu tiên
+                if (value.length === 2 && !value.includes(':')) {
+                    this.value = value + ':';
+                } else if (value.length > 2 && !value.includes(':')) {
+                    this.value = value.substring(0, 2) + ':' + value.substring(2);
+                } else {
+                    this.value = value;
+                }
+            });
+        }
+
+        // Reset form đăng ký
+        function resetRegisterForm() {
+            document.getElementById('registerForm').reset();
+            document.getElementById('searchResult').style.display = 'none';
+            setCurrentTime();
+        }
+
+        // Tìm kiếm sinh viên
+        async function searchStudent() {
+            const keyword = document.getElementById("searchInput").value;
+            const resultDiv = document.getElementById("searchResult");
+
+            if (keyword.length >= 7) {
+                try {
+                    const response = await fetch(`/api/search_data?keyword=${encodeURIComponent(keyword)}`);
+                    const result = await response.json();
+                    displaySearchResult(result);
+                } catch (error) {
+                    console.error('Lỗi tìm kiếm:', error);
+                    resultDiv.textContent = "Lỗi kết nối máy chủ";
+                    resultDiv.style.display = "block";
+                }
+            } else {
+                resultDiv.style.display = 'none';
+            }
+        }
+
+        function displaySearchResult(result) {
+            const resultDiv = document.getElementById("searchResult");
+            const mssvInput = document.getElementById("mssv");
+            const khoaInput = document.getElementById("khoavien");
+
+            if (result.length > 0) {
+                mssvInput.value = result[0][0];
+                khoaInput.value = result[0][1];
+                resultDiv.textContent = "Đã tìm thấy thông tin sinh viên";
+                resultDiv.style.display = "block";
+            } else {
+                mssvInput.value = "";
+                khoaInput.value = "";
+                resultDiv.textContent = "Không tìm thấy thông tin sinh viên";
+                resultDiv.style.display = "block";
+            }
+        }
+
+        // Xử lý submit form đăng ký
+        async function handleRegisterSubmit(event) {
+            event.preventDefault();
+
+            // Validate form
+            if (!validateRegisterForm()) {
+                return;
+            }
+
+            const formData = {
+                mssv: document.getElementById('mssv').value,
+                khoavien: document.getElementById('khoavien').value,
+                phonghocnhom: document.getElementById('phonghocnhom').value,
+                soluong: document.getElementById('soluong').value,
+                time: document.getElementById('time').value
+            };
+
+            try {
+                const response = await fetch('/api/register_room', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công!',
+                        text: result.message,
+                        confirmButtonText: 'OK',
+                    }).then(() => {
+                        resetRegisterForm();
+                    });
+                } else {
+                    throw new Error(result.error || 'Có lỗi xảy ra khi đăng ký');
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi',
+                    text: error.message,
+                    confirmButtonText: 'OK',
+                });
+            }
+        }
+
+        // Validate form đăng ký
+        function validateRegisterForm() {
+            const timeInput = document.getElementById('time');
+            const value = timeInput.value.trim();
+            const timeRegex = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
+            
+            if (!timeRegex.test(value)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi định dạng giờ',
+                    text: 'Vui lòng nhập giờ theo định dạng 24h: HH:MM (ví dụ: 13:00, 14:30)',
+                    confirmButtonText: 'OK'
+                });
+                timeInput.focus();
+                return false;
+            }
+
+            // Kiểm tra số lượng
+            const soluong = document.getElementById('soluong').value;
+            if (soluong < 1 || soluong > 20) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi số lượng',
+                    text: 'Số lượng thành viên phải từ 1 đến 20 người',
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
+
+            return true;
+        }
+
+        // Khởi tạo khi trang tải
+        window.onload = function() {
+            setCurrentTime();
+            validateTimeInput();
+        };
+    </script>
+</body>
+</html>

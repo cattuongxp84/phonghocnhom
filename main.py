@@ -233,6 +233,10 @@ def report():
 def display():
     return render_template('display.html')
 
+@app.route('/register')
+def register():
+    return render_template('register.html', version=APP_VERSION)
+
 # ==================== API ENDPOINTS (OPTIMIZED) ====================
 @app.route('/api/add_dulieusv', methods=['POST'])
 def add_dulieusv():
@@ -898,7 +902,88 @@ def get_report_data():
         import traceback
         traceback.print_exc()
         return jsonify([])
-                        
+    
+# ==================== API ĐĂNG KÝ PHÒNG ====================
+@app.route('/api/register_room', methods=['POST'])
+def register_room():
+    try:
+        data = request.json
+        client = connect_to_sheets()
+        
+        if not client:
+            return jsonify({'error': 'Không thể kết nối Google Sheets'}), 500
+        
+        sheet_id = os.environ.get('SHEET_ID', '1i5N5Gdk-SqPN7Vy5IFiHiK5CTCw9WDag2EMZ1GBI8Wo')
+        spreadsheet = client.open_by_key(sheet_id)
+        sheet_data1 = spreadsheet.worksheet('Data1')
+        sheet_listds = spreadsheet.worksheet('LISTDS')
+        
+        mssv = data.get('mssv', '')
+        khoavien = data.get('khoavien', '')
+        phonghocnhom = data.get('phonghocnhom', '')
+        soluong = data.get('soluong', '')
+        time_str = data.get('time', '')
+        
+        if not all([mssv, khoavien, phonghocnhom, soluong, time_str]):
+            return jsonify({'error': 'Vui lòng nhập đầy đủ thông tin!'}), 400
+        
+        # Validate time format
+        import re
+        time_regex = re.compile(r'^([01][0-9]|2[0-3]):[0-5][0-9]$')
+        if not time_regex.match(time_str):
+            return jsonify({'error': 'Định dạng giờ không hợp lệ. Vui lòng sử dụng định dạng HH:MM (24h)'}), 400
+        
+        # Lấy ngày hiện tại
+        current_date = datetime.now()
+        formatted_date = current_date.strftime("%d/%m/%Y")
+        
+        # Xác định vị trí tầng dựa trên số phòng
+        try:
+            phong_num = int(phonghocnhom)
+            if 1 <= phong_num <= 7:
+                floor_position = 'Lầu 3'
+            elif 8 <= phong_num <= 14:
+                floor_position = 'Lầu 4'
+            else:
+                floor_position = 'Tầng trệt'
+        except ValueError:
+            floor_position = 'Không xác định'
+        
+        # Thêm dữ liệu vào Data1
+        new_row = [
+            mssv, 
+            khoavien, 
+            phonghocnhom, 
+            soluong, 
+            time_str,  # Giờ đăng ký
+            formatted_date,  # Ngày đăng ký
+            floor_position   # Vị trí tầng
+        ]
+        
+        sheet_data1.append_row(new_row)
+        
+        # Xóa cache Data1 vì có dữ liệu mới
+        if 'Data1' in data_cache:
+            del data_cache['Data1']
+            print("🧹 [CACHE] Đã xóa cache Data1 do có đăng ký mới")
+        
+        # Kiểm tra và thêm vào LISTDS nếu chưa có
+        listds_data = sheet_listds.get_all_values()
+        existing_mssvs = [row[0].replace("'", "") for row in listds_data[1:] if row]
+        
+        clean_mssv = mssv.replace("'", "")
+        if clean_mssv not in existing_mssvs:
+            sheet_listds.append_row([mssv, khoavien])
+            print(f"✅ Đã thêm sinh viên mới vào LISTDS: {clean_mssv}")
+        
+        return jsonify({'message': 'Đăng ký phòng học nhóm thành công!'})
+        
+    except Exception as e:
+        print(f"❌ Lỗi register_room: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Lỗi server: {str(e)}'}), 500
+                            
 if __name__ == '__main__':
     print("Đang khởi động ứng dụng...")
     try:
